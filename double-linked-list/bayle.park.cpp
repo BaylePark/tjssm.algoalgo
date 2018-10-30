@@ -60,13 +60,9 @@ struct List
     void remove(Node<T> *node)
     {
         if (node == head)
-        {
             head = node->next;
-        }
         if (node == tail)
-        {
             tail = node->prev;
-        }
         if (node->next)
             node->next->prev = node->prev;
         if (node->prev)
@@ -111,7 +107,17 @@ struct List
         }
         printf("\n");
     }
-    
+    void print_reverse()
+    {
+        const Node<T> *target_node = tail;
+        while (target_node)
+        {
+            pnt_fn(target_node->data);
+            printf(" -> ");
+            target_node = target_node->prev;
+        }
+        printf("\n");
+    }
     Node<T> *head, *tail;
     Allocator< Node<T> > &allocator;
     compare_fn cmp_fn;
@@ -137,6 +143,33 @@ static void print_point2d(const Point2D &data)
 Allocator< Node<Point2D> > point2d_allocator;
 List<Point2D> point2d_list(point2d_allocator, compare_point2d, print_point2d);
 
+/* output
+ push p1 node
+ (1, 1) ->
+ (1, 1) ->
+ push p2 node
+ (1, 1) -> (1, 2) ->
+ (1, 2) -> (1, 1) ->
+ push p3 node
+ (1, 1) -> (1, 2) -> (2, 2) ->
+ (2, 2) -> (1, 2) -> (1, 1) ->
+ find p2 node
+ (1, 2)
+ insert p4 node after p2 node
+ (1, 1) -> (1, 2) -> (4, 1) -> (2, 2) ->
+ (2, 2) -> (4, 1) -> (1, 2) -> (1, 1) ->
+ remove p1 node
+ (1, 2) -> (4, 1) -> (2, 2) ->
+ (2, 2) -> (4, 1) -> (1, 2) ->
+ remove p3 node
+ (1, 2) -> (4, 1) ->
+ (4, 1) -> (1, 2) ->
+ remove p4 node
+ (1, 2) ->
+ (1, 2) ->
+ Program ended with exit code: 0
+*/
+
 int main()
 {
     printf("push p1 node\n");
@@ -145,6 +178,7 @@ int main()
     p1.y = 1;
     Node<Point2D>* p1_node = point2d_list.push(p1);
     point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("push p2 node\n");
     Point2D p2;
@@ -152,6 +186,7 @@ int main()
     p2.y = 2;
     Node<Point2D>* p2_node = point2d_list.push(p2);
     point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("push p3 node\n");
     Point2D p3;
@@ -159,6 +194,7 @@ int main()
     p3.y = 2;
     Node<Point2D>* p3_node = point2d_list.push(p3);
     point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("find p2 node\n");
     Point2D to_find_p2;
@@ -174,16 +210,20 @@ int main()
     p4.y = 1;
     Node<Point2D>* p4_node = point2d_list.insert(target_p2, p4);
     point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("remove p1 node\n");
     point2d_list.remove(p1_node);
     point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("remove p3 node\n");
     point2d_list.remove(p3_node);
     point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("remove p4 node\n");
     point2d_list.remove(p4_node);
     point2d_list.print();
+    point2d_list.print_reverse();
 }
