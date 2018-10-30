@@ -1,73 +1,99 @@
 #include <iostream>
 using namespace std;
 
+template <typename T>
 struct Node {
-	int x;
-	int y;
+	T data;
 	Node* next;
 	Node* prev;
 };
 
+template <typename T>
 class List {
 private:
 	int nodeCnt;
-	Node* head;
-	Node* tail;
+	Node<T>* head;
+	Node<T>* tail;
 public:
 	List() {
 		head = NULL;
 		tail = NULL;
 	}
-	void insertNode(int x, int y,int idx);
-	void push(int x, int y);
-	Node* findNode(int x, int y);
-	void removeNode(int x, int y);
-	void printNode();
+	void insertNode(T data,int idx);
+	void push(T data);
+	Node<T>* findNode(T data);
+	void removeNode(T data);
+};
+
+
+struct Point_2D {
+	int x;
+	int y;
 };
 
 
 
 int main()
 {
-	List* list = new List;
-	list->push(1, 1);
-	list->push(2, 2);
-	list->push(3, 3);
-	list->insertNode(5, 5, 3);
-	list->removeNode(2, 2);
-	list->printNode();
+	List<Point_2D>* list = new List<Point_2D>;
+	Point_2D first;
+	first.x = first.y = 1;
+	
+	Point_2D second;
+	second.x = second.y = 2;
+
+	Point_2D third;
+	third.x = third.y = 5;
+
+	Point_2D ten;
+	ten.x = ten.y = 10;
+
+	list->push(first);
+	list->push(second);
+	list->push(third);
+	list->insertNode(ten, 1);
+	list->removeNode(third);
+	//list->printNode();
 	return 0;
 }
 
-void List::insertNode(int x, int y,int idx) {
+template <typename T>
+void List<T>::insertNode(T data,int idx) {
+	idx--;
 	if (nodeCnt <=idx) {
 		printf("노드 갯수보다 큰 idx 삽입 불가\n");
 	}
 	nodeCnt++;
-	Node* tmp = head;
-	Node* node = new Node;
+	Node<T>* tmp = head;
+	Node<T>* node = new Node<T>;
 	node->next = NULL;
 	node->prev = NULL;
-	node->x = x;
-	node->y = y;
+	node->data = data;
 	for (int i = 0; i < idx; i++) {
 		tmp = tmp->next;
 	}
 
-	tmp->prev->next = node;
-	node->prev = tmp->prev;
-	node->next = tmp;
-	tmp->prev = node;
-
+	if (tmp == head) {
+		node->next = tmp;
+		tmp->prev = node;
+		head = node;
+	}
+	else {
+		tmp->prev->next = node;
+		node->prev = tmp->prev;
+		node->next = tmp;
+		tmp->prev = node;
+	}
 }
 
-void List::push(int x, int y) {
+
+template <typename T>
+void List<T>::push(T data) {
 	nodeCnt++;
-	Node* node = new Node;
+	Node<T>* node = new Node<T>;
 	node->next = NULL;
 	node->prev = NULL;
-	node->x = x;
-	node->y = y;
+	node->data = data;
 	if (head == NULL) {
 		head = node;
 		tail = node;
@@ -79,26 +105,32 @@ void List::push(int x, int y) {
 	}
 }
 
-Node* List::findNode(int x, int y) {
-	Node* node = head;
+template <typename T>
+Node<T>* List<T>::findNode(T data) {
+	Node<T>* node = head;
 	for (int i = 0; i < nodeCnt; i++) {
-		if (node->x == x && node->y == y) {
-			return node;
-		}
+		//if (node->data == data) {
+		//	return node;
+		//}
 		node = node->next;
 	}
 	return NULL;
 }
 
-void List::removeNode(int x, int y) {
+template <typename T>
+void List<T>::removeNode(T data) {
 	nodeCnt--;
-	Node* node = findNode(x, y);
+	Node<T>* node = findNode(data);
 	if (node == head) {
-		node->next->prev = NULL;
+		if (node->next) {
+			node->next->prev = NULL;
+		}
 		head = node->next;
 	}
 	else if (node == tail) {
-		node->prev->next = NULL;
+		if (node->prev) {
+			node->prev->next = NULL;
+		}
 		tail = node->prev;
 	}
 	else {
@@ -110,10 +142,15 @@ void List::removeNode(int x, int y) {
 	node = NULL;
 }
 
-void List::printNode() {
-	Node* node = head;
-	for (int i = 0; i < nodeCnt; i++) {
-		printf("%d 번째 노드 x : %d, y : %d\n", i, node->x, node->y);
-		node = node->next;
-	}
-}
+
+
+
+
+
+//void List::printNode() {
+//	Node* node = head;
+//	for (int i = 0; i < nodeCnt; i++) {
+//		printf("%d 번째 노드 x : %d, y : %d\n", i, node->x, node->y);
+//		node = node->next;
+//	}
+//}
