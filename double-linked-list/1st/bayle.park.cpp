@@ -144,30 +144,39 @@ Allocator< Node<Point2D> > point2d_allocator;
 List<Point2D> point2d_list(point2d_allocator, compare_point2d, print_point2d);
 
 /* output
- push p1 node
- (1, 1) ->
- (1, 1) ->
- push p2 node
- (1, 1) -> (1, 2) ->
- (1, 2) -> (1, 1) ->
- push p3 node
- (1, 1) -> (1, 2) -> (2, 2) ->
- (2, 2) -> (1, 2) -> (1, 1) ->
- find p2 node
- (1, 2)
- insert p4 node after p2 node
- (1, 1) -> (1, 2) -> (4, 1) -> (2, 2) ->
- (2, 2) -> (4, 1) -> (1, 2) -> (1, 1) ->
- remove p1 node
- (1, 2) -> (4, 1) -> (2, 2) ->
- (2, 2) -> (4, 1) -> (1, 2) ->
- remove p3 node
- (1, 2) -> (4, 1) ->
- (4, 1) -> (1, 2) ->
- remove p4 node
- (1, 2) ->
- (1, 2) ->
- Program ended with exit code: 0
+push p1 node
+(1, 1) -> 
+(1, 1) -> 
+push p2 node
+(1, 1) -> (1, 2) -> 
+(1, 2) -> (1, 1) -> 
+push p3 node
+(1, 1) -> (1, 2) -> (2, 2) -> 
+(2, 2) -> (1, 2) -> (1, 1) -> 
+find p2 node
+(1, 2)
+change data
+(9, 9)
+find p2 node
+(9, 9)
+(1, 1) -> (9, 9) -> (2, 2) -> 
+(2, 2) -> (9, 9) -> (1, 1) -> 
+insert p4 node after p2 node
+(1, 1) -> (9, 9) -> (4, 1) -> (2, 2) -> 
+(2, 2) -> (4, 1) -> (9, 9) -> (1, 1) -> 
+remove p1 node
+(9, 9) -> (4, 1) -> (2, 2) -> 
+(2, 2) -> (4, 1) -> (9, 9) -> 
+remove p3 node
+(9, 9) -> (4, 1) -> 
+(4, 1) -> (9, 9) -> 
+remove p4 node
+(9, 9) -> 
+(9, 9) -> 
+remove target_p2 node
+
+
+Program ended with exit code: 0
 */
 
 int main()
@@ -203,6 +212,21 @@ int main()
     Node<Point2D> *target_p2 = point2d_list.find(NULL, to_find_p2);
     print_point2d(target_p2->data);
     printf("\n");
+
+    printf("change data\n");
+    target_p2->data.x = 9;
+    target_p2->data.y = 9;
+    print_point2d(target_p2->data);
+    printf("\n");
+
+    printf("find p2 node\n");
+    to_find_p2.x = 9;
+    to_find_p2.y = 9;
+    target_p2 = point2d_list.find(NULL, to_find_p2);
+    print_point2d(target_p2->data);
+    printf("\n");
+    point2d_list.print();
+    point2d_list.print_reverse();
     
     printf("insert p4 node after p2 node\n");
     Point2D p4;
@@ -224,6 +248,11 @@ int main()
     
     printf("remove p4 node\n");
     point2d_list.remove(p4_node);
+    point2d_list.print();
+    point2d_list.print_reverse();
+    
+    printf("remove target_p2 node\n");
+    point2d_list.remove(target_p2);
     point2d_list.print();
     point2d_list.print_reverse();
 }
