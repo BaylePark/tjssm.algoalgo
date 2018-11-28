@@ -46,6 +46,8 @@ int main() {
 	list.print();
 	list.printReverse();
 	list.pushNode(2, 2);
+	list.print();
+	list.printReverse();
 	Node* foundNode = list.findNode(1, 2);
 	list.printNode(foundNode);
 	foundNode->x = 9;
