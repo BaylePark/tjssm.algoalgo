@@ -1,4 +1,3 @@
-// 30 + a
 #include <iostream>
 using namespace std;
 
@@ -118,6 +117,7 @@ void list::insertNode(Node* node, int x, int y) {
 }
 
 void list::removeNode(Node* node) {
+	cnt--;
 	if (node == head && node == tail) {
 		head = 0;
 		tail = 0;
@@ -129,6 +129,9 @@ void list::removeNode(Node* node) {
 	else if (node == tail) {
 		node->prev->next = 0;
 		tail = node->prev;
+	} else {
+		node->prev->next = node->next;
+		node->next->prev = node->prev;
 	}
 }
 
