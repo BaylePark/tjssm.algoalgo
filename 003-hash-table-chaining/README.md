@@ -1,23 +1,23 @@
 ## INPUT
 ```
-"MSFT",   "Microsoft Corporation"
-"JAVA",   "Sun Microsystems"
-"REDH",   "Red Hat Linux"
-"APAC",   "Apache Org"
-"ZYMZZ",  "Unisys Ops Check"
-"IBM",    "IBM Ltd."
-"ORCL",   "Oracle Corporation"
-"CSCO",   "Cisco Systems, Inc."
-"GOOG",   "Google Inc."
-"YHOO",   "Yahoo! Inc."
-"NOVL",   "Novell, Inc."
-"JAVA",   "Oracle"
-"JAVA",   "OpenJDK"
+MSFT Microsoft Corporation
+JAVA Sun Microsystems
+REDH Red Hat Linux
+APAC Apache Org
+ZYMZZ Unisys Ops Check
+IBM IBM Ltd.
+ORCL Oracle Corporation
+CSCO Cisco Systems, Inc.
+GOOG Google Inc.
+YHOO Yahoo! Inc.
+NOVL Novell, Inc.
+JAVA Oracle
+JAVA OpenJDK
 ```
 
 ## Delete
 ```
-"JAVA",   "Oracle"
+JAVA Oracle
 ```
 
 ## HashKey Function
