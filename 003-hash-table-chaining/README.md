@@ -1,16 +1,16 @@
 ## INPUT
 ```
-MSFT Microsoft Corporation
-JAVA Sun Microsystems
-REDH Red Hat Linux
-APAC Apache Org
-ZYMZZ Unisys Ops Check
-IBM IBM Ltd.
-ORCL Oracle Corporation
-CSCO Cisco Systems, Inc.
-GOOG Google Inc.
-YHOO Yahoo! Inc.
-NOVL Novell, Inc.
+MSFT MicrosoftCorporation
+JAVA SunMicrosystems
+REDH RedHatLinux
+APAC ApacheOrg
+ZYMZZ UnisysOpsCheck
+IBM IBMLtd.
+ORCL OracleCorporation
+CSCO CiscoSystems,Inc.
+GOOG GoogleInc.
+YHOO Yahoo!Inc.
+NOVL Novell,Inc.
 JAVA Oracle
 JAVA OpenJDK
 ```
@@ -39,15 +39,15 @@ unsigned long hash(const char *str)
 
 ## OUTPUT
 ```
-"MSFT"      ->  "Microsoft Corporation"
-"JAVA"      ->   "Sun Microsystems", "OpenJDK"
-"REDH"      ->   "Red Hat Linux"
-"APAC"      ->   "Apache Org"
-"ZYMZZ"     ->  "Unisys Ops Check" 
-"IBM"       ->    "IBM Ltd."
-"ORCL"      ->   "Oracle Corporation"
-"CSCO"      ->   "Cisco Systems, Inc."
-"GOOG"      ->   "Google Inc."
-"YHOO"      ->   "Yahoo! Inc."
-"NOVL"      ->   "Novell, Inc."
+"MSFT"      ->  "MicrosoftCorporation"
+"JAVA"      ->  "SunMicrosystems", "OpenJDK"
+"REDH"      ->  "RedHatLinux"
+"APAC"      ->  "ApacheOrg"
+"ZYMZZ"     ->  "UnisysOpsCheck"
+"IBM"       ->  "IBMLtd."
+"ORCL"      ->  "OracleCorporation"
+"CSCO"      ->  "CiscoSystems,Inc."
+"GOOG"      ->  "GoogleInc."
+"YHOO"      ->  "Yahoo!Inc."
+"NOVL"      ->  "Novell,Inc."
 ```
