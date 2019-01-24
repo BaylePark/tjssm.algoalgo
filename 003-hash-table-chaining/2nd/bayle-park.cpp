@@ -49,10 +49,10 @@ struct NodeList {
       tail = node->prev;
     }
     if (node->next) {
-      node->next->prev = node->next;
+      node->next->prev = node->prev;
     }
     if (node->prev) {
-      node->prev->next = node->prev;
+      node->prev->next = node->next;
     }
   }
   Node<T> *head, *tail;
