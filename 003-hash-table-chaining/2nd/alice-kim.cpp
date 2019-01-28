@@ -45,7 +45,6 @@ int main() {
 	}
 	printValue("JAVA");
 	deleteValue("JAVA", "OpenJDK");
-	deleteValue("JAVA", "Sun");
 	printValue("JAVA");
 	return 0;
 
@@ -70,22 +69,13 @@ void add(char* key, char* data) {
 void deleteValue(char* key, char* data) {
 	unsigned long val = myHash(key);
 
-	Node* current = hashTable[val];
-	if (strcmp(current->data, data) == 0) {
-		hashTable[val] = current->next;
-	}
-	else {
-		Node* prev = current;
-		current = current->next;
-		while (current) {
-			if (strcmp(current->data, data) == 0) {
-				prev->next = current->next;
-				current = 0;
-				return;
-			}
-			prev = current;
-			current = current->next;
+	Node** node = &hashTable[val];
+	while (node) {
+		if (strcmp((*node)->data, data) == 0) {
+			*node = (*node)->next;
+			break;
 		}
+		node = &(*node)->next;
 	}
 }
 void printValue(char* key) {
