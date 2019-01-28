@@ -70,7 +70,7 @@ void deleteValue(char* key, char* data) {
 	unsigned long val = myHash(key);
 
 	Node** node = &hashTable[val];
-	while (node) {
+	while (*node) {
 		if (strcmp((*node)->data, data) == 0) {
 			*node = (*node)->next;
 			break;
