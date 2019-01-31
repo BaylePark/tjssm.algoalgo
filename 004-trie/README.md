@@ -99,7 +99,7 @@ int main() {
     }
   }
   for (const std::string& str : kRemoving) {
-    if (algo::search(str.c_str()) == true) {
+    if (algo::search(str.c_str()) == false) {
       score -= 5;
     }
   }
