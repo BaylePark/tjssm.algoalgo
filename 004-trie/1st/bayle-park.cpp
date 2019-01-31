@@ -45,8 +45,7 @@ namespace algo {
     }
     
     int toi(const char c) {
-        if (c >= 'a' && c <= 'z') return (int)(c - 'a');
-        else return (int)(c - 'A');
+        return (int)(c - 'A');
     }
     
     void insert(const char* str) {
