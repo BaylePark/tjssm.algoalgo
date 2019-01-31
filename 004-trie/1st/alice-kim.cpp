@@ -2,8 +2,9 @@
 #include <vector>
 #include <string>
 
-#define MAX_ALPHA 52
+#define MAX_ALPHA 58
 #define MAX_NODE 1000
+// A 65, Z 90 // a 97, z 122
 /************************************************************
 * Please Implement It!
 */
@@ -16,7 +17,7 @@ namespace algo {
 
 	Node node[MAX_NODE];
 	int nodeIdx;
-	
+
 	Node* getNode() {
 		node[nodeIdx].isEnd = false;
 		for (int i = 0; i < MAX_ALPHA; i++) {

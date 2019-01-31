@@ -15,7 +15,7 @@ typedef struct tagWord {
 
 typedef struct tagTrie {
    // 122 - 65 = 57
-   Word word[57];
+   Word word[58];
    tagTrie * nextNode;
 }Trie;
 
@@ -53,7 +53,7 @@ namespace algo {
 
    bool search(const char* str) {
       int strSize = strlen(str);
-      Trie** cur = &Head;
+      Trie* cur = Head;
       for (int i = 0; i < strSize; i++) {
          if (*cur == NULL) {
             return false;

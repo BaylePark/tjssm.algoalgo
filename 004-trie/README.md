@@ -36,6 +36,8 @@ bool remove(const char* str) {
  */
 namespace {
 const std::vector<std::string> kPositiveTC = {
+  "zZed",
+  "ZZezd",
   "the",
   "THE",
   "a",
@@ -49,6 +51,7 @@ const std::vector<std::string> kPositiveTC = {
 };
 const std::vector<std::string> kRemoving = {
   "the",
+  "ZZezd",
   "a",
   "by",
   "heroplane",
