@@ -45,7 +45,8 @@ namespace algo {
     }
     
     int toi(const char c) {
-        return (int)(c - 'A');
+        if (c >= 'a' && c <= 'z') return (int)(c - 'a');
+        else return (int)(c - 'A' + 27);
     }
     
     void insert(const char* str) {
@@ -113,6 +114,8 @@ namespace {
         "their",
         "hero",
         "heroplane",
+        "zzzzzzzz",
+        "ZZZZZZZZ",
     };
     const std::vector<std::string> kRemoving = {
         "the",
