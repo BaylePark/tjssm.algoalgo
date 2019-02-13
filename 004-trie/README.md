@@ -36,6 +36,8 @@ bool remove(const char* str) {
  */
 namespace {
 const std::vector<std::string> kPositiveTC = {
+  "zZed",
+  "ZZezd",
   "the",
   "THE",
   "a",
@@ -49,6 +51,7 @@ const std::vector<std::string> kPositiveTC = {
 };
 const std::vector<std::string> kRemoving = {
   "the",
+  "ZZezd",
   "a",
   "by",
   "heroplane",
@@ -99,7 +102,7 @@ int main() {
     }
   }
   for (const std::string& str : kRemoving) {
-    if (algo::search(str.c_str()) == true) {
+    if (algo::search(str.c_str()) == false) {
       score -= 5;
     }
   }
