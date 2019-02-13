@@ -30,19 +30,20 @@ namespace algo {
 		for (int i = 0; i < CELL_SIZE; i++) {
 			for (int j = 0; j < CELL_SIZE; j++) {
 				findPattern = findPattern + pattern[i][j];
+				findPattern = findPattern << 4;
 			}
 		}
 		int posIdx = 0;
 		for (int i = 0; i < PICT_SIZE / 4; i++) {
 			for (int j = 0; j < PICT_SIZE / 4; j++) {
 				if (myPattern[i][j] == findPattern) {
-					pos[posIdx].x = j;
-					pos[posIdx].y = i;
+					pos[posIdx].x = j*4;
+					pos[posIdx].y = i*4;
 					posIdx++;
 				}
 			}
 		}
-		return 0;
+		return posIdx;
 	}
 }  // namespace algo
 
