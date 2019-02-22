@@ -18,7 +18,7 @@ namespace algo {
 			for (int j = 0; j < PICT_SIZE; j++) {
 				int endY = i / 4;
 				int endX = j / 4;
-				myPattern[endY][endX] = myPattern[endY][endX] + picture[i][j];
+				myPattern[endY][endX] |= picture[i][j];
 				myPattern[endY][endX] = myPattern[endY][endX] << 4;
 			}
 		}
@@ -29,7 +29,7 @@ namespace algo {
 		unsigned long long findPattern = 0;
 		for (int i = 0; i < CELL_SIZE; i++) {
 			for (int j = 0; j < CELL_SIZE; j++) {
-				findPattern = findPattern + pattern[i][j];
+				findPattern |= pattern[i][j];
 				findPattern = findPattern << 4;
 			}
 		}
