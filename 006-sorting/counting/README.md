@@ -8,6 +8,7 @@
 
 ## 필수 구현 목표
 1. 사전 순으로 출력
+2. Counting Sort 용 배열의 크기 
 
 ## Test case
 ```
