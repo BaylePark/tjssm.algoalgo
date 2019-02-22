@@ -11,11 +11,13 @@
 
 ## Test case
 ```
-10
+12
 aaa
 zzz
 adb
+dab
 cse
+esc
 ldk
 ckw
 cse
