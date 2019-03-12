@@ -16,8 +16,8 @@ namespace algo {
 	void init(const unsigned char picture[PICT_SIZE][PICT_SIZE]) { 
 		for (int i = 0; i < PICT_SIZE; i++) {
 			for (int j = 0; j < PICT_SIZE; j++) {
+				myPattern[i / 4][j / 4] = myPattern[i / 4][j / 4] << 4;
 				myPattern[i / 4][j / 4] = myPattern[i / 4][j / 4] | picture[i][j];
-				myPattern[i / 4][j / 4] = myPattern[i/4][j/4] << 4;
 			}
 		}
 		return; 
@@ -28,8 +28,8 @@ namespace algo {
 		unsigned long long tmp = 0;
 		for (int i = 0; i < CELL_SIZE; i++) {
 			for (int j = 0; j < CELL_SIZE; j++) {
-				tmp = tmp | pattern[i][j];
 				tmp = tmp << 4;
+				tmp = tmp | pattern[i][j];
 			}
 		}
 		for (int i = 0; i < PATTERN_SIZE; i++) {
