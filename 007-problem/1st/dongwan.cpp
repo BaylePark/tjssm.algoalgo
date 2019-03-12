@@ -1,208 +1,393 @@
 #include <stdio.h>
-#include <string.h>
+#include <iostream>
+#include <malloc.h>
+using namespace std;
+#define MAX_RECORD_SIZE 50005
+#define MAX_HASH_SIZE 10007
 
 typedef enum
 {
-   CMD_INIT,
-   CMD_ADD,
-   CMD_DELETE,
-   CMD_CHANGE,
-   CMD_SEARCH
-} COMMAND;
-
-typedef enum
-{
-   NAME,
-   NUMBER,
-   BIRTHDAY,
-   EMAIL,
-   MEMO
+	NAME,
+	NUMBER,
+	BIRTHDAY,
+	EMAIL,
+	MEMO
 } FIELD;
 
 typedef struct
 {
-   int count;
-   char str[20];
+	int count;
+	char str[20];
 } RESULT;
 
+typedef struct tagUser {
+	char name[20];
+	char number[20];
+	char birthday[20];
+	char email[20];
+	char memo[20];
+}User;
+
+typedef struct tagHash {
+	User *user;
+	tagHash *next = NULL;
+}Hash;
+
+Hash* hashTable[MAX_HASH_SIZE];
+User* userList[MAX_RECORD_SIZE];
+int userDataSize = 0;
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-
-extern void InitDB();
-extern void Add(char* name, char* number, char* birthday, char* email, char* memo);
-extern int Delete(FIELD field, char* str);
-extern int Change(FIELD field, char* str, FIELD changefield, char* changestr);
-extern RESULT Search(FIELD field, char* str, FIELD returnfield);
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-static int dummy[100];
-static int Score, ScoreIdx;
-static char name[20], number[20], birthday[20], email[20], memo[20];
-
-static char lastname[10][5] = { "kim", "lee", "park", "choi", "jung", "kang", "cho", "oh", "jang", "lim" };
-static int lastname_length[10] = { 3, 3, 4, 4, 4, 4, 3, 2, 4, 3 };
-
-static int mSeed;
-static int mrand(int num)
-{
-   mSeed = mSeed * 1103515245 + 37209;
-   if (mSeed < 0) mSeed *= -1;
-   return ((mSeed >> 8) % num);
+void strcpy_(char*a, char*b) {
+	int idx = 0;
+	while (a[idx]) {
+		b[idx] = a[idx];
+		idx++;
+	}
+	b[idx] = '\0';
 }
 
-static void make_field(int seed)
-{
-   int name_length, email_length, memo_length;
-   int idx, num;
-
-   mSeed = (unsigned int)seed;
-
-   name_length = 6 + mrand(10);
-   email_length = 10 + mrand(10);
-   memo_length = 5 + mrand(10);
-
-   num = mrand(10);
-   for (idx = 0; idx < lastname_length[num]; idx++) name[idx] = lastname[num][idx];
-   for (; idx < name_length; idx++) name[idx] = 'a' + mrand(26);
-   name[idx] = 0;
-
-   for (idx = 0; idx < memo_length; idx++) memo[idx] = 'a' + mrand(26);
-   memo[idx] = 0;
-
-   for (idx = 0; idx < email_length - 6; idx++) email[idx] = 'a' + mrand(26);
-   email[idx++] = '@';
-   email[idx++] = 'a' + mrand(26);
-   email[idx++] = '.';
-   email[idx++] = 'c';
-   email[idx++] = 'o';
-   email[idx++] = 'm';
-   email[idx] = 0;
-
-   idx = 0;
-   number[idx++] = '0';
-   number[idx++] = '1';
-   number[idx++] = '0';
-   for (; idx < 11; idx++) number[idx] = '0' + mrand(10);
-   number[idx] = 0;
-
-   idx = 0;
-   birthday[idx++] = '1';
-   birthday[idx++] = '9';
-   num = mrand(100);
-   birthday[idx++] = '0' + num / 10;
-   birthday[idx++] = '0' + num % 10;
-   num = 1 + mrand(12);
-   birthday[idx++] = '0' + num / 10;
-   birthday[idx++] = '0' + num % 10;
-   num = 1 + mrand(30);
-   birthday[idx++] = '0' + num / 10;
-   birthday[idx++] = '0' + num % 10;
-   birthday[idx] = 0;
+int strSize(char*a) {
+	int idx = 0;
+	while (a[idx]) {
+		idx++;
+	}
+	return idx;
 }
 
-static void cmd_init()
-{
-   scanf("%d", &ScoreIdx);
-
-   InitDB();
-}
-int wrongAnser = 0;
-
-static void cmd_add()
-{
-   int seed;
-   scanf("%d", &seed);
-
-   make_field(seed);
-
-   Add(name, number, birthday, email, memo);
+int strCmp(char *a, char *b) {
+	int aSize = strSize(a);
+	int bSize = strSize(b);
+	if (aSize != bSize)
+		return 0;
+	int idx = 0;
+	while (a[idx]) {
+		if (a[idx] != b[idx])
+			return 0;
+		idx++;
+	}
+	return 1;
 }
 
-static void cmd_delete()
+unsigned long hashKey(const char *str)
 {
-   wrongAnser++;
-   int field, check, result;
-   char str[20];
-   scanf("%d %s %d", &field, str, &check);
+	unsigned long hash = 5381;
+	int c;
 
-   result = Delete((FIELD)field, str);
-   if (result != check)
-      Score -= ScoreIdx;
+	while (c = *str++)
+	{
+		hash = (((hash << 5) + hash) + c) % MAX_HASH_SIZE;
+	}
+
+	return hash % MAX_HASH_SIZE;
 }
 
-static void cmd_change()
-{
-   int field, changefield, check, result;
-   char str[20], changestr[20];
-   scanf("%d %s %d %s %d", &field, str, &changefield, changestr, &check);
-
-   result = Change((FIELD)field, str, (FIELD)changefield, changestr);
-   if (result != check)
-      Score -= ScoreIdx;
+User* createUser(char* name, char* number, char* birthday, char* email, char* memo) {
+	User* user = (User*)malloc(sizeof(User));
+	strcpy_(name, user->name);
+	strcpy_(number, user->number);
+	strcpy_(birthday, user->birthday);
+	strcpy_(email, user->email);
+	strcpy_(memo, user->memo);
+	return user;
 }
 
-static void cmd_search()
-{
-   int field, returnfield, check;
-   char str[20], checkstr[20];
-   scanf("%d %s %d %s %d", &field, str, &returnfield, checkstr, &check);
-
-   RESULT result = Search((FIELD)field, str, (FIELD)returnfield);
-
-   if (result.count != check || (result.count == 1 && (strcmp(checkstr, result.str) != 0)))
-      Score -= ScoreIdx;
+Hash* createHash() {
+	Hash* hash = (Hash*)malloc(sizeof(Hash));
+	hash->next = NULL;
+	hash->user = NULL;
+	return hash;
 }
 
-static void run()
-{
-   int N;
-   scanf("%d", &N);
-   for (int i = 0; i < N; i++)
-   {
-      int cmd;
-      scanf("%d", &cmd);
-      switch (cmd)
-      {
-      case CMD_INIT:   cmd_init();   break;
-      case CMD_ADD:    cmd_add();    break;
-      case CMD_DELETE: cmd_delete(); break;
-      case CMD_CHANGE: cmd_change(); break;
-      case CMD_SEARCH: cmd_search(); break;
-      default: break;
-      }
-   }
+void insertTable(User* user, int key) {
+	if (hashTable[key] == NULL) {
+		hashTable[key] = createHash();
+		hashTable[key]->user = user;
+	}
+	else {
+		Hash* temp = hashTable[key];
+		hashTable[key] = createHash();
+		hashTable[key]->next = temp;
+	}
 }
 
-static void init()
+void InitDB()
 {
-   Score = 1000;
-   ScoreIdx = 1;
+	if (userDataSize != 0) {
+		for (int i = 0; i < userDataSize; i++) {
+			User *u = userList[i];
+			free(u);
+		}
+	}
+	userDataSize = 0;
+	for (int i = 0; i < MAX_HASH_SIZE; i++) {
+		if (hashTable != NULL) {
+			Hash* temp = hashTable[i];
+			Hash* before = NULL;
+			while (temp) {
+				before = temp;
+				temp = temp->next;
+				free(before);
+			}
+			hashTable[i] = NULL;
+		}
+	}
 }
 
-int main()
+void Add(char* name, char* number, char* birthday, char* email, char* memo)
 {
-   setbuf(stdout, NULL);
-   freopen("eval_input.txt", "r", stdin);
+	User*u = createUser(name, number, birthday, email, memo);
+	userList[userDataSize++] = u;
 
-   int T;
-   scanf("%d", &T);
+	cout << "ADD " << " addr:" << u << " name:" << name << " number:" << number << " birthday:" << birthday << " email:" << email << " memo:" << memo << endl;
+	int keyName = hashKey(name);
+	int keyNumber = hashKey(number);
+	int keyBirthday = hashKey(birthday);
+	int keyEmail = hashKey(email);
+	int keyMemo = hashKey(memo);
+	insertTable(u, keyName);
+	insertTable(u, keyNumber);
+	insertTable(u, keyBirthday);
+	insertTable(u, keyEmail);
+	insertTable(u, keyMemo);
+}
 
-   int TotalScore = 0;
-   for (int tc = 1; tc <= T; tc++)
-   {
-      init();
+void deleteHash(Hash *temp, int key) {
+	Hash* temp2 = hashTable[key];
+	while (temp2) {
+		if (temp2->user == temp->user) {
+			temp2->user = NULL;
+			break;
+		}
+		temp2 = temp2->next;
+	}
+}
+int Delete(FIELD field, char* str)
+{
+	int key = hashKey(str);
+	cout << "Delete >> field:" << field << " str:" << str << " key:" << key << endl;
+	int cnt = 0;
+	Hash* temp = hashTable[key];
+	Hash* tempNext = NULL;
+	while (temp) {
+		if (temp->user == NULL) {
+			temp = temp->next;
+			continue;
+		}
+		if (field == NAME) {
+			if (strCmp(str, temp->user->name)) {
+				int keyNumber = hashKey(temp->user->number);
+				int keyBirthday = hashKey(temp->user->birthday);
+				int keyEmail = hashKey(temp->user->email);
+				int keyMemo = hashKey(temp->user->memo);
 
-      run();
+				deleteHash(temp, keyNumber);
+				deleteHash(temp, keyBirthday);
+				deleteHash(temp, keyEmail);
+				deleteHash(temp, keyMemo);
+				temp->user = NULL;
+				cnt++;
+			}
+		}
+		else if (field == NUMBER) {
+			if (strCmp(str, temp->user->number)) {
+				int keyName = hashKey(temp->user->name);
+				int keyBirthday = hashKey(temp->user->birthday);
+				int keyEmail = hashKey(temp->user->email);
+				int keyMemo = hashKey(temp->user->memo);
 
-      if (Score < 0)
-         Score = 0;
+				deleteHash(temp, keyName);
+				deleteHash(temp, keyBirthday);
+				deleteHash(temp, keyEmail);
+				deleteHash(temp, keyMemo);
+				temp->user = NULL;
+				cnt++;
+			}
+		}
+		else if (field == BIRTHDAY) {
+			if (strCmp(str, temp->user->birthday)) {
+				int keyName = hashKey(temp->user->name);
+				int keyNumber = hashKey(temp->user->number);
+				int keyEmail = hashKey(temp->user->email);
+				int keyMemo = hashKey(temp->user->memo);
 
-      TotalScore += Score;
-      printf("#%d %d\n", tc, Score);
-   }
-   printf("TotalScore = %d\n", TotalScore);
+				deleteHash(temp, keyName);
+				deleteHash(temp, keyNumber);
+				deleteHash(temp, keyEmail);
+				deleteHash(temp, keyMemo);
+				temp->user = NULL;
+				cnt++;
+			}
+		}
+		else if (field == EMAIL) {
+			if (strCmp(str, temp->user->email)) {
+				int keyName = hashKey(temp->user->name);
+				int keyNumber = hashKey(temp->user->number);
+				int keyBirthday = hashKey(temp->user->birthday);
+				int keyMemo = hashKey(temp->user->memo);
 
-   return 0;
+				deleteHash(temp, keyName);
+				deleteHash(temp, keyNumber);
+				deleteHash(temp, keyBirthday);
+				deleteHash(temp, keyMemo);
+				temp->user = NULL;
+				cnt++;
+			}
+		}
+		else if (field == MEMO) {
+			if (strCmp(str, temp->user->memo)) {
+				int keyName = hashKey(temp->user->name);
+				int keyNumber = hashKey(temp->user->number);
+				int keyBirthday = hashKey(temp->user->birthday);
+				int keyEmail = hashKey(temp->user->email);
+
+				deleteHash(temp, keyName);
+				deleteHash(temp, keyNumber);
+				deleteHash(temp, keyBirthday);
+				deleteHash(temp, keyEmail);
+				temp->user = NULL;
+				cnt++;
+			}
+		}
+		temp = temp->next;
+	}
+	if (cnt != 0)
+		return cnt;
+	return -1;
+}
+
+void changeHash(Hash* temp, FIELD changefield, char* changestr) {
+	if (changefield == NAME) {
+		strcpy_(changestr, temp->user->name);
+	}
+	else if (changefield == NUMBER) {
+		strcpy_(changestr, temp->user->number);
+	}
+	else if (changefield == BIRTHDAY) {
+		strcpy_(changestr, temp->user->birthday);
+	}
+	else if (changefield == EMAIL) {
+		strcpy_(changestr, temp->user->email);
+	}
+	else if (changefield == MEMO) {
+		strcpy_(changestr, temp->user->memo);
+	}
+}
+int Change(FIELD field, char* str, FIELD changefield, char* changestr)
+{
+	int key = hashKey(str);
+	cout << "Change >> field:" << field << " str:" << str << " changefield:" << changefield << " changestr:" << changestr << " key:" << key << endl;
+	Hash* temp = hashTable[key];
+	int cnt = 0;
+	while (temp) {
+		if (temp->user == NULL) {
+			temp = temp->next;
+			continue;
+		}
+		if (field == NAME) {
+			if (strCmp(str, temp->user->name)) {
+				changeHash(temp, changefield, changestr);
+				cnt++;
+				break;
+			}
+		}
+		else if (field == NUMBER) {
+			if (strCmp(str, temp->user->number)) {
+				changeHash(temp, changefield, changestr);
+				cnt++;
+				break;
+			}
+		}
+		else if (field == BIRTHDAY) {
+			if (strCmp(str, temp->user->birthday)) {
+				changeHash(temp, changefield, changestr);
+				cnt++;
+				break;
+			}
+		}
+		else if (field == EMAIL) {
+			if (strCmp(str, temp->user->email)) {
+				changeHash(temp, changefield, changestr);
+				cnt++;
+				break;
+			}
+		}
+		else if (field == MEMO) {
+			if (strCmp(str, temp->user->memo)) {
+				changeHash(temp, changefield, changestr);
+				cnt++;
+				break;
+			}
+		}
+		temp = temp->next;
+	}
+	if (cnt != 0) {
+		return cnt;
+	}
+	return -1;
+}
+
+RESULT Search(FIELD field, char* str, FIELD ret_field)
+{
+	RESULT result;
+	result.count = -1;
+
+	int key = hashKey(str);
+	int cnt = 0;
+	Hash* temp = hashTable[key];
+	Hash* beforeHash;
+	while (temp) {
+		if (field == NAME) {
+			if (strCmp(str, temp->user->name)) {
+				beforeHash = temp;
+				cnt++;
+			}
+		}
+		else if (field == NUMBER) {
+			if (strCmp(str, temp->user->number)) {
+				beforeHash = temp;
+				cnt++;
+			}
+		}
+		else if (field == BIRTHDAY) {
+			if (strCmp(str, temp->user->birthday)) {
+				beforeHash = temp;
+				cnt++;
+			}
+		}
+		else if (field == EMAIL) {
+			if (strCmp(str, temp->user->email)) {
+				beforeHash = temp;
+				cnt++;
+			}
+		}
+		else if (field == MEMO) {
+			if (strCmp(str, temp->user->memo)) {
+				beforeHash = temp;
+				cnt++;
+			}
+		}
+		temp = temp->next;
+	}
+	if (cnt != 0) {
+		result.count = cnt;
+		if (ret_field == NAME) {
+			strcpy_(beforeHash->user->name, result.str);
+		}
+		else if (ret_field == NUMBER) {
+			strcpy_(beforeHash->user->number, result.str);
+		}
+		else if (ret_field == BIRTHDAY) {
+			strcpy_(beforeHash->user->birthday, result.str);
+		}
+		else if (ret_field == EMAIL) {
+			strcpy_(beforeHash->user->email, result.str);
+		}
+		else if (ret_field == MEMO) {
+			strcpy_(beforeHash->user->memo, result.str);
+		}
+	}
+	result.count = cnt;
+	return result;
 }
