@@ -16,7 +16,6 @@ int dbCur;
 Node mDB[MAX_SIZE];
 Node *mNode;
 Node *mHead;
-Node *mRear;
 
 int main() {
    mHead = &mDB[dbCur++];
@@ -54,24 +53,11 @@ int main() {
          Node* nextNode = mNode->next;
          if (nextNode != NULL || beforeNode != NULL) {
             if (mNode == mHead) {
-               mHead->next = nextNode;
-               if (nextNode != NULL) {
-                  nextNode->prev = mHead;
-               }
+               //
             }
             else if (nextNode == NULL) {
                beforeNode->next = NULL;
                mNode = beforeNode;
-            }
-            else if (beforeNode == mHead) {
-               if (nextNode == NULL) {
-                  mHead->next = NULL;
-               }
-               else {
-                  mHead->next = nextNode;
-                  nextNode->prev = mHead;
-               }
-               mNode = mHead;
             }
             else {
                beforeNode->next = nextNode;
@@ -87,8 +73,11 @@ int main() {
          temp->ch = ch3;
          temp->next = mNode->next;
          temp->prev = mNode;
+         if (mNode->next != NULL) {
+            mNode->next->prev = temp;
+         }
          mNode->next = temp;
-         mNode = mNode->next;
+         mNode = temp;
       }
    }
    while (mHead->next) {
