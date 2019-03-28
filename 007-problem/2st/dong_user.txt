@@ -1,0 +1,356 @@
+//#include <malloc.h>
+//#include <iostream>
+#define NULL 0
+using namespace std;
+
+typedef enum
+{
+	NAME,
+	NUMBER,
+	BIRTHDAY,
+	EMAIL,
+	MEMO
+} FIELD;
+
+typedef struct
+{
+	int count;
+	char str[20];
+} RESULT;
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+#define MAX_TABLE 10007
+#define MAX_USER 50000
+#define MAX_FIELD 5
+
+typedef struct tagUser {
+	char data[5][20];
+}User;
+User mUser[50000];
+int mUsreCnt = 0;
+
+typedef struct tagHash {
+	int field;
+	User* user;
+	tagHash* next;
+}Hash;
+
+Hash *mHash[MAX_TABLE];
+Hash mDB[MAX_USER*5];
+int mDBcur = 0;
+
+unsigned long getHashKey(const char *str)
+{
+	unsigned long hash = 5381;
+	int c;
+	while (c = *str++)
+	{
+		hash = (((hash << 5) + hash) + c) % MAX_TABLE;
+	}
+	return hash % MAX_TABLE;
+}
+
+void InitDB()
+{
+	mUsreCnt = 0;
+	for (int i = 0; i < MAX_TABLE; i++) {
+		mHash[i] = NULL;
+	}
+	for (int i = 0; i < MAX_TABLE*5; i++) {
+		mDB[i].user = NULL;
+		mDB[i].next = NULL;
+	}
+	mDBcur = 0;
+}
+
+void strCpy(char *dest, char*str2) {
+	while (*str2) *dest++ = *str2++;
+	*dest = '\0';
+}
+
+int strCmp(char* str1, char*str2) {
+	while (*str2)
+	{
+		if (*str1++ != *str2++) {
+			return -1;
+		}
+	}
+	return *str1 - *str2;
+}
+void addHash(int field, int key, User *user) {
+	if (mHash[key] == NULL) {
+		mHash[key] = &mDB[mDBcur++];
+		mHash[key]->user = user;
+		mHash[key]->field = field;
+	}
+	else {
+		Hash*temp = mHash[key];
+		mHash[key] = &mDB[mDBcur++];
+		mHash[key]->next = temp;
+		mHash[key]->user = user;
+		mHash[key]->field = field;
+	}
+}
+
+void Add(char* name, char* number, char* birthday, char* email, char* memo)
+{
+	User *u = &mUser[mUsreCnt++];
+	strCpy(u->data[NAME], name);
+	strCpy(u->data[NUMBER], number);
+	strCpy(u->data[BIRTHDAY], birthday);
+	strCpy(u->data[EMAIL], email);
+	strCpy(u->data[MEMO], memo);
+	
+	for (int i = 0; i < 5; i++) {
+		int key = getHashKey(u->data[i]);
+		addHash(i, key, u);
+	}
+}
+
+void deleteHash(int field, int key, Hash* delHash) {
+	Hash* before = NULL;
+	for (Hash* cur = mHash[key]; cur; cur = cur->next) {
+		if (field == cur->field && cur->user == delHash->user) {
+			if (before == NULL) {
+				mHash[key] = cur->next;
+			}
+			else {
+				before->next = cur->next;
+			}
+		}
+		before = cur;
+	}
+}
+
+int Delete(FIELD field, char* str)
+{
+	//cout << "Delete:" << '\t' << "field:" << field << '\t' << "str:" << str << endl;
+	int delKey = getHashKey(str);
+	if (mHash[delKey] == NULL)
+		return 0;
+	int cnt = 0;
+	for (Hash* delHash = mHash[delKey]; delHash; delHash = delHash->next) {
+		if (delHash->field == field && strCmp(delHash->user->data[field], str) == 0) {
+			for (int i = 0; i < MAX_FIELD; i++) {
+				int fieldKey = getHashKey(delHash->user->data[i]);
+				if (mHash[fieldKey] != NULL) {
+					deleteHash(i, fieldKey, delHash);
+				}
+			}
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
+int Change(FIELD field, char* str, FIELD changefield, char* changestr)
+{
+	int key = getHashKey(str);
+	if (mHash[key] == NULL)
+		return 0;
+	int cnt = 0;
+	Hash* changeHash = mHash[key];
+	for(; changeHash != NULL; changeHash = changeHash->next) {
+		if (changeHash->field == field && strCmp(changeHash->user->data[field], str) == 0) {
+			//delete
+			int delKey = getHashKey(changeHash->user->data[changefield]);
+			deleteHash(changeHash->field, delKey, changeHash);
+
+			// add
+			strCpy(changeHash->user->data[changefield], changestr);
+			int changekey = getHashKey(changestr);
+			addHash(changefield, changekey, changeHash->user);
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
+RESULT Search(FIELD field, char* str, FIELD ret_field)
+{
+	RESULT result;
+	result.count = 0;
+	int key = getHashKey(str);
+	if (mHash[key] == NULL) {
+		return result;
+	}
+
+	Hash* temp = mHash[key];
+	while (temp) {
+		if (temp->field == field && strCmp(temp->user->data[field], str) == 0) {
+			strCpy(result.str, temp->user->data[ret_field]);
+			result.count++;
+		}
+		temp = temp->next;
+	}
+	return result;
+}
+
+
+/*
+
+#include<malloc.h>
+#include<stdio.h>
+typedef enum
+{
+	NAME,
+	NUMBER,
+	BIRTHDAY,
+	EMAIL,
+	MEMO
+} FIELD;
+
+typedef struct
+{
+	int count;
+	char str[20];
+} RESULT;
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#define MAX_TABLE 10007
+#define MAX_USER 50000
+
+typedef struct user {
+	char field[5][20]; // field 5, value max length 20
+}user_t;
+
+typedef struct hash {
+	user_t *user;
+	FIELD field;
+	struct hash *next;
+}hash_t;
+
+int user_cnt;
+int h_user_cnt; 
+user_t users[MAX_USER];
+hash_t h_users[MAX_USER*5];
+hash_t *hash_table[MAX_TABLE];
+
+unsigned long getHashKey(const char *str)
+{
+	unsigned long hash = 5381;
+	int c;
+	while (c = *str++)
+	{
+		hash = (((hash << 5) + hash) + c) % MAX_TABLE;
+	}
+	return hash % MAX_TABLE;
+}
+
+void InitDB()
+{
+	user_cnt = 0;
+	h_user_cnt = 0;
+	for (int i = 0; i < MAX_TABLE; i++) hash_table[i] = NULL;
+}
+
+
+int strcmp(char *a, char *b) {
+	for (; *a != '\0' && *b != '\0'; a++, b++)
+	{
+		if (*a != *b) break;
+	}
+	return *a - *b;
+}
+
+void strcpy(char *dst, char *src) {
+	while(*src) *dst++ = *src++;
+	*dst = '\0';
+}
+
+void add_hash_table(char *str_key, FIELD field, user_t *user) {
+	int key = getHashKey(str_key);
+	h_users[h_user_cnt].user = user;
+	h_users[h_user_cnt].field = field;
+	if (hash_table[key] != NULL) {
+		h_users[h_user_cnt].next = hash_table[key];
+	}
+	else {
+		h_users[h_user_cnt].next = NULL;
+	}
+	hash_table[key] = &h_users[h_user_cnt++];
+}
+
+void Add(char* name, char* number, char* birthday, char* email, char* memo)
+{
+	int idx = user_cnt++;
+	strcpy(users[idx].field[NAME], name);
+	strcpy(users[idx].field[NUMBER], number);
+	strcpy(users[idx].field[BIRTHDAY], birthday);
+	strcpy(users[idx].field[EMAIL], email);
+	strcpy(users[idx].field[MEMO], memo);
+	for(int i = 0; i < 5; i++)
+		add_hash_table(users[idx].field[i], (FIELD)i, &users[idx]);
+}
+
+user_t *delete_hash_table(char *str_key, FIELD field, user_t *user) {
+	int key = getHashKey(str_key);
+	if (hash_table[key] != NULL) {
+		hash_t *before = NULL;
+		for (hash_t *cur = hash_table[key]; cur != NULL; before = cur, cur = cur->next) {
+			if(cur->field == field && strcmp(cur->user->field[field], str_key) == 0) {
+				if (user == NULL || user == cur->user) {
+					if (before == NULL) hash_table[key] = cur->next;
+					else before->next = cur->next;
+					return cur->user;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+int Delete(FIELD field, char* str)
+{
+	int delete_cnt = 0;
+	user_t *user = delete_hash_table(str, field, NULL);
+	while (user != NULL) {
+		delete_cnt++;
+		for (int i = 0; i < 5; i++) {
+			if (i != field) {
+				delete_hash_table(user->field[i], (FIELD)i, user);
+			}
+		}
+		user = delete_hash_table(str, field, NULL);
+	}
+	return delete_cnt;
+}
+
+int Change(FIELD field, char* str, FIELD changefield, char* changestr)
+{
+	int update_cnt = 0;
+	int key = getHashKey(str);
+	if (hash_table[key] != NULL) {
+		for (hash_t *cur = hash_table[key]; cur != NULL; cur = cur->next) {
+			if (cur->field == field && strcmp(cur->user->field[field], str) == 0){
+				user_t *user = cur->user;
+				add_hash_table(changestr, changefield, user);
+				delete_hash_table(user->field[changefield], changefield, user);
+				strcpy(user->field[changefield], changestr);
+				update_cnt++;
+			}
+		}
+	}
+	return update_cnt;
+}
+
+RESULT Search(FIELD field, char* str, FIELD ret_field)
+{
+	RESULT result;
+	result.count = 0;
+	int key = getHashKey(str);
+	if (hash_table[key] != NULL) {
+		for (hash_t *cur = hash_table[key]; cur != NULL; cur = cur->next) {
+			if (cur->field == field && strcmp(cur->user->field[field], str) == 0) {
+				strcpy(result.str, cur->user->field[ret_field]);
+				result.count++;
+			}
+		}
+	} 
+	return result;
+}
+
+*/
