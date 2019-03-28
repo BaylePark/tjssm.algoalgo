@@ -11,15 +11,6 @@ struct Node {
 char inputLine[100000];
 Node node[800000];
 int idx;
-
-int myStrlen(char* input) {
-	int idx = 0;
-	while (input[idx]) {
-		idx++;
-
-	}
-	return idx;
-}
 class List {
 private:
 
@@ -45,9 +36,9 @@ Node* getNode() {
 int main() {
 	cin >> inputLine;
 	List list;
-	int length = myStrlen(inputLine);
-	for (int i = 0; i < length; i++) {
-		list.insert(inputLine[i]);
+	int length = 0;
+	while (inputLine[length]) {
+		list.insert(inputLine[length++]);
 	}
 	int tc = 0;
 	cin >> tc;
