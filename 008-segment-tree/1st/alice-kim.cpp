@@ -2,11 +2,7 @@
 #include <math.h>
 using namespace std;
 
-<<<<<<< HEAD
 #define MAX_SIZE (1 << 21)
-=======
-#define MAX_SIZE 1000
->>>>>>> 04b964841e30bfff847f561daaae82cf66658d55
 long long tree[MAX_SIZE];
 long long arr[MAX_SIZE];
 
