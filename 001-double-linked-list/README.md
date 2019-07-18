@@ -19,6 +19,8 @@
     - List의 맨 처음부터 맨 끝까지 출력하기
   - 마지막부터 리스트 내용 출력하기(ReversalPrint)
     - List의 맨 끝부터 맨 처음까지 출력하기
+  - 정렬하기(Sort)
+    - List 정렬하기 (x 우선순위)
 
 ### Test Cases
 ```cpp
@@ -54,6 +56,8 @@ ReversalPrint()             => (9, 9)
 Remove(FoundNode2)
 Print()                     => 
 ReversalPrint()             => 
+Sort()
+Print()
 ```
 
 
